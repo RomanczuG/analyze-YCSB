@@ -1,23 +1,8 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 def analyze_results(file_path):
-    """
-    Use ``analyze_results(file_path)`` to analyze the results of a benchmark test.
-    This function will read the file at the given file path, parse the data, and
-    print out two dataframes containing the results of the benchmark test.
-
-    Parameters
-    ----------
-    file_path : str
-        The path to the file containing the benchmark test results
-
-    Returns
-    ----------
-    dfR : pandas.DataFrame
-        DataFrame containing the results of the benchmark test for each operation
-    dfO : pandas.DataFrame
-        DataFrame containing the overall results of the benchmark test
-    """
     with open(file_path) as f:
         lines = f.readlines()
 
@@ -61,9 +46,74 @@ def analyze_results(file_path):
     print (dfO)
     return dfR, dfO
 
+def create_grouped_bar_plots(df_dict, title, ylabel, measurements):
+    configurations = list(df_dict.keys())
+    num_configurations = len(configurations)
+    
+    # measurements = []
+    num_measurements = len(measurements)
+    
+    bar_width = 0.25
+    bar_spacing = 0.05
+    group_spacing = 0.3
+    group_width = num_configurations * bar_width + (num_configurations - 1) * bar_spacing
+    
+    fig, ax = plt.subplots()
+    
+    colors = plt.cm.get_cmap('tab10', num_configurations)
+    
+    for j, measurement in enumerate(measurements):
+        for i, config in enumerate(configurations):
+            if measurement in df_dict[config]['operation'].values:
+                data = df_dict[config].loc[df_dict[config]['operation'] == measurement, 'average_latency'].values[0]
+                ax.bar(j * (group_width + group_spacing) + i * (bar_width + bar_spacing), data, bar_width, label=config if j == 0 else "", color=colors(i))
+    
+    ax.set_xlabel('Measurement')
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(np.arange(num_measurements) * (group_width + group_spacing) + (group_width - bar_width) / 2)
+    ax.set_xticklabels(measurements)
+    ax.legend()
+    
+    fig.tight_layout()
+    plt.show()
+
+
+
+
+
 if __name__ == "__main__":
     # analyze_results("../YCSB/outputRun.txt")
-    for configuration in ["outputRun_50_50_mem_50mb.txt", "outputRun_50_50_mem_150mb.txt", "outputRun_50_50_mem_1gb.txt", "outputLoad_50_50_mem_50mb.txt", "outputLoad_50_50_mem_150mb.txt", "outputLoad_50_50_mem_1gb.txt"]: 
-        analyze_results(configuration)
-    for configuration in ["outputRun_50_50.txt", "outputLoad_50_50.txt", "outputRun_90_10.txt", "outputLoad_90_10.txt"]:
-        analyze_results(configuration)
+    dfRa = {}
+    dfOa = {}
+    for configuration in ["outputRun_50_50_mem_50mb.txt", "outputRun_50_50_mem_150mb.txt", "outputRun_50_50_mem_1gb.txt"]: 
+        dfR, df0 = analyze_results(configuration)
+        dfRa[configuration] = dfR
+        dfOa[configuration] = df0
+    
+    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
+    
+    dfRa = {}
+    dfOa = {}
+    for configuration in ["outputLoad_50_50_mem_50mb.txt", "outputLoad_50_50_mem_150mb.txt", "outputLoad_50_50_mem_1gb.txt"]:
+        dfR, df0 = analyze_results(configuration)
+        dfRa[configuration] = dfR
+        dfOa[configuration] = df0
+    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+    dfRa = {}
+    dfOa = {}
+
+    for configuration in ["outputRun_50_50.txt", "outputRun_90_10.txt"]:
+        dfR, df0 = analyze_results(configuration)
+        dfRa[configuration] = dfR
+        dfOa[configuration] = df0
+    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
+    dfRa = {}
+    dfOa = {}
+    for configuration in [ "outputLoad_50_50.txt", "outputLoad_90_10.txt"]:
+        dfR, df0 = analyze_results(configuration)
+        dfRa[configuration] = dfR
+        dfOa[configuration] = df0
+    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+
+
