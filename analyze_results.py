@@ -79,8 +79,30 @@ def create_grouped_bar_plots(df_dict, title, ylabel, measurements):
     plt.show()
 
 
+def create_another_bar(dfOa, title, ylabel):
+    configurations = list(dfOa.keys())
+    measurements = dfOa[configurations[0]].columns.tolist()
+    num_configurations = len(configurations)
+    num_measurements = len(measurements)
+    bar_width = 0.15
+    indices = np.arange(num_measurements)
+    fig, ax = plt.subplots()
 
+    colors = plt.cm.get_cmap('tab10', num_configurations)
+    
+    for i, config in enumerate(configurations):
+        values = dfOa[config].loc[0].tolist()
+        ax.bar(indices + i * bar_width, values, bar_width, color=colors.colors[i], label=config)
 
+    ax.set_xlabel('Measurement')
+    ax.set_ylabel(ylabel)
+    ax.set_title(title)
+    ax.set_xticks(indices + bar_width * (num_configurations - 1) / 2)
+    ax.set_xticklabels(measurements)
+    ax.legend(title='Configurations')
+
+    fig.tight_layout()
+    plt.show()
 
 if __name__ == "__main__":
     # analyze_results("../YCSB/outputRun.txt")
@@ -91,15 +113,17 @@ if __name__ == "__main__":
         dfRa[configuration] = dfR
         dfOa[configuration] = df0
     
-    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
-    
+    create_grouped_bar_plots(dfRa, 'Run test for different memory allocation', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
+    # create_another_bar(dfOa['outputRun_50_50_mem_50mb.txt'], 'Run test for different memory allocation', 'Runtime (ms)')
+    create_another_bar(dfOa, 'Run test for different memory allocation', '')
     dfRa = {}
     dfOa = {}
     for configuration in ["outputLoad_50_50_mem_50mb.txt", "outputLoad_50_50_mem_150mb.txt", "outputLoad_50_50_mem_1gb.txt"]:
         dfR, df0 = analyze_results(configuration)
         dfRa[configuration] = dfR
         dfOa[configuration] = df0
-    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+    create_grouped_bar_plots(dfRa, 'Load test for different memory allocation', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+    create_another_bar(dfOa, 'Load test for different memory allocation', '')
     dfRa = {}
     dfOa = {}
 
@@ -107,13 +131,15 @@ if __name__ == "__main__":
         dfR, df0 = analyze_results(configuration)
         dfRa[configuration] = dfR
         dfOa[configuration] = df0
-    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
+    create_grouped_bar_plots(dfRa, 'Run test for different ratio of update operations', 'Latency (us)', ['[READ]', '[UPDATE]', '[CLEANUP]'])
+    create_another_bar(dfOa, 'Run test for different ratio of update operations', '')
     dfRa = {}
     dfOa = {}
     for configuration in [ "outputLoad_50_50.txt", "outputLoad_90_10.txt"]:
         dfR, df0 = analyze_results(configuration)
         dfRa[configuration] = dfR
         dfOa[configuration] = df0
-    create_grouped_bar_plots(dfRa, '95th Percentile Latency', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+    create_grouped_bar_plots(dfRa, 'Load test for different ratio of update operations', 'Latency (us)', ['[CLEANUP]', '[INSERT]'])
+    create_another_bar(dfOa, 'Load test for different ratio of update operations', '')
 
 
