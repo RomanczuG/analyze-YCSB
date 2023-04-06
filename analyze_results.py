@@ -63,4 +63,7 @@ def analyze_results(file_path):
 
 if __name__ == "__main__":
     # analyze_results("../YCSB/outputRun.txt")
-    analyze_results("outputRun_50_50_mem_50mb.txt")
+    for configuration in ["outputRun_50_50_mem_50mb.txt", "outputRun_50_50_mem_150mb.txt", "outputRun_50_50_mem_1gb.txt", "outputLoad_50_50_mem_50mb.txt", "outputLoad_50_50_mem_150mb.txt", "outputLoad_50_50_mem_1gb.txt"]: 
+        analyze_results(configuration)
+    for configuration in ["outputRun_50_50.txt", "outputLoad_50_50.txt", "outputRun_90_10.txt", "outputLoad_90_10.txt"]:
+        analyze_results(configuration)
