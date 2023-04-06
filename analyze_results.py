@@ -28,4 +28,4 @@ def analyze_results(file_path):
     print("Average Throughput (ops/sec):", avg_throughput)
 
 if __name__ == "__main__":
-    analyze_results("./outputRun.txt")
+    analyze_results("../YCSB/outputRun.txt")
