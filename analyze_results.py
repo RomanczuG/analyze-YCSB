@@ -54,7 +54,7 @@ def analyze_results(file_path):
                 overall['Runtime(ms)'].append(float(parts[2]))
             elif parts[1] == "Throughput(ops/sec),":
                 overall['Throughput(ops/sec)'].append(float(parts[2]))
-
+    print(file_path)
     dfR = pd.DataFrame(data)
     dfO = pd.DataFrame(overall)
     print (dfR)
@@ -63,4 +63,4 @@ def analyze_results(file_path):
 
 if __name__ == "__main__":
     # analyze_results("../YCSB/outputRun.txt")
-    analyze_results("outputRun_50_50.txt")
+    analyze_results("outputRun_50_50_mem_50mb.txt")
